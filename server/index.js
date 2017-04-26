@@ -1,4 +1,5 @@
 var express = require('express');
+var db = require('../database/index.js');
 
 var app = express();
 
