@@ -5,7 +5,7 @@ const RepoListEntry = ({repo}) => (
   <div>
     <p>REPO OWNER: {repo.owner}</p>
     REPO NAME: <a href={repo.link}>{repo.name}</a>
-    <p>REPO FORKS: {repo.forks}</p>
+    <p>REPO size: {repo.size}</p>
   </div>
 
 )

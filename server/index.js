@@ -48,7 +48,6 @@ app.post('/repos/import', function (req, res) {
   .then( (repos) => {
       //filter out the information we want -> or do this in the request
       //if I can filter like that, I can maybe pass each item right into the db
-      let formattedRepos = [];
       let response = JSON.parse(repos);
       // console.log(response);
       console.log('SUCCESS FROM GITHUB');
@@ -56,38 +55,29 @@ app.post('/repos/import', function (req, res) {
       response.forEach( (repo) => {
         let formatted = formatRepo(repo);
 
-        
-
-        db.repo.find({owner: repo.owner.login}, function(err, doc) {
-          
-          if (err) {//this repo doesnt exists in our database
-
+        db.repo.find({link: repo.html_url}, function(err, doc) {   
+          if (doc.length === 0) {//this repo doesnt exists in our database
             db.repo(formatted).save(function(err, doc) {
-              if (err) {
-                console.log('error', err.message);
-              } else {
-                console.log('INPUTED INTO DB SUCCESSFULLY LOLOL');
-              }
+              if (err) { console.log('error', err.message);
+              
+              } else { console.log('INPUTED INTO DB SUCCESSFULLY LOLOL'); }//repo doesn't exist
             })
-            //add the repo to a list to be sent back to client
-            formattedRepos.push(formatted);
-          }
-          else {
-            console.log('Repo already exists in database');
-          }
+          
+          } else { console.log('Repo already exists!'); }
+        
         })
 
-        
-
       });
-      // console.log('', formattedRepos)
-      //send back an array of repos
-      res.send(JSON.stringify(formattedRepos));
 
     }
   )
   .catch( (err) => {
-    console.log('ERROR ', err);
+    console.log('CAUGHT ERROR ', err);
+  })
+  .then( () => {
+    res.sendStatus(200);
+    res.end();
+    console.log('whatever')
   });
 
 
@@ -98,9 +88,21 @@ app.post('/repos/import', function (req, res) {
 
 
 app.get('/repos', function (req, res) {
-  console.log('get request received by server');
-  // TODO
+  db.repo.find({}, (err, docs) => {
+  
+    var top = docs.sort( (x, y) => {
+      return y.size - x.size;
+    }).slice(0, 25);
+
+    res.send(top);
+  });
+
 });
+
+
+
+
+
 
 app.get('/', function(req, res) {
   console.log('page load req sent to server');

@@ -10,9 +10,39 @@ class App extends React.Component {
     this.state = { 
       repos: []
     }
-
     //anytme i need to use a method with 'this', needs to bind in constructor
     this.search = this.search.bind(this);
+    this.filter = this.filterRepos.bind(this);
+  }
+
+  //this isn't working
+  filterRepos (repos) {
+    let onPage = this.state.repos;
+    let filtered = [];
+    repos.forEach( (repo) => {
+      if ( !onPage.includes(repo) ) {
+        filtered.push(repo);
+      } else {
+      }
+    });
+    return filtered;
+  }
+
+  updateTopRepos() {
+    let context = this;
+    $.get({
+      url: 'http://127.0.0.1:1128/repos',
+      contentType: "application/json",
+      success: function(newRepos) {
+
+        console.log('something back from get repo request');
+        context.setState({
+          repos: newRepos
+        });
+
+      },
+      error: function(err) { console.log('error updating top repos', err); }
+    })
   }
 
   search (term) {
@@ -28,14 +58,15 @@ class App extends React.Component {
       contentType: "application/json",
       success: function(newRepos) {
         //this has incorrect binding
-          //need to make a function, and then bind it and pass it into this function
-          //**************************************************************
-          //pass the correct this obj
-          let current = context.state.repos 
-        context.setState({
-          repos: current.concat(JSON.parse(newRepos))
-        })
-
+          //****************************
+          //pass the correct this context
+          console.log('Repos retrieved for ', term, ' successfully!');
+        // let current = context.state.repos;
+        // let toBeAdded = context.filterRepos( JSON.parse(newRepos) );
+        // context.setState({
+        //   repos: current.concat(toBeAdded)
+        // });
+        context.updateTopRepos();
       },
       error: function(err) {
         console.log('error ', err);
