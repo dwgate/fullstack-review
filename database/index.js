@@ -1,17 +1,25 @@
 var mongoose = require('mongoose');
+var Schema = mongoose.Schema;
 mongoose.connect('mongodb://localhost/fetcher');
 
-var repoSchema = mongoose.Schema({
+
+var repoSchema = new Schema({
+  id: Number,
+  owner: String,
+  name: String,
+  description: String,
+  link: String,
+  size: Number
+});
+
+var userSchema = new Schema({
   id: Number,
   name: String,
   user_id: Number
 });
 
-var userSchema = mongoose.Schema({
-  id: Number,
-  name: String,
-  user_id: Number
-});
+var repoModel = mongoose.model('repos', repoSchema);
+var userModel = mongoose.model('users', userSchema);
 
 
 
@@ -23,6 +31,6 @@ db.once('open', function() {
 });
 
 
-module.exports.repo = repoSchema;
-module.exports.user = userSchema;
+module.exports.repo = repoModel;
+module.exports.user = userModel;
 

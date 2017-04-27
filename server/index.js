@@ -18,6 +18,7 @@ app.use(express.static(__dirname + '/../client/dist'));
 
 let formatRepo = function(repo) {
   let formatted = {
+    id: repo.id,
     owner: repo.owner.login,
     name: repo.name,
     description: repo.description,
@@ -29,11 +30,13 @@ let formatRepo = function(repo) {
 
 app.post('/repos/import', function (req, res) {
   // e49dd7c7bd0dfc907b7c32eef1187b0b93aa7cf8
+  // 'e49dd7c7bd0dfc907b7c32eef1187b0b93aa7cf8': 'x-oauth-basic',
   let userName = req.body.user;
   console.log('processing request for user: ' , userName);
 
   let options = {
     url: 'https://api.github.com/users/' + userName + '/repos',
+    Authorization: 'dwgate https://api.github.com',
     headers: {
       'user-agent':'dwgate' 
     }
@@ -50,10 +53,24 @@ app.post('/repos/import', function (req, res) {
       console.log('SUCCESS FROM GITHUB');
 
       response.forEach( (repo) => {
-        formattedRepos.push(formatRepo(repo));
+        let formatted = formatRepo(repo);
+
+        formattedRepos.push(formatted);
+
+        db.repo(formatted).save(function(err, doc) {
+          if (err) {
+            console.log('error', err.message);
+          } else {
+            console.log('INPUTED INTO DB SUCCESSFULLY LOLOL');
+          }
+        })
+
       });
       // console.log('', formattedRepos)
       //send back an array of repos
+
+
+
       res.send(JSON.stringify(formattedRepos));
 
     }
