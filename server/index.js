@@ -6,7 +6,7 @@ const cors = require('cors');
 const app = express();
 const mongoose = require('mongoose');
 const fs = require('fs');
-const rp = require('request-promise')
+const rp = require('request-promise');
 
 app.use(cors());
 
@@ -36,8 +36,9 @@ app.post('/repos/import', function (req, res) {
 
   let options = {
     url: 'https://api.github.com/users/' + userName + '/repos',
-    Authorization: 'dwgate https://api.github.com',
+    // Authorization: 'dwgate https://api.github.com',
     headers: {
+      'Authorization': 'token e49dd7c7bd0dfc907b7c32eef1187b0b93aa7cf8',
       'user-agent':'dwgate' 
     }
   };
@@ -55,22 +56,32 @@ app.post('/repos/import', function (req, res) {
       response.forEach( (repo) => {
         let formatted = formatRepo(repo);
 
-        formattedRepos.push(formatted);
+        
 
-        db.repo(formatted).save(function(err, doc) {
-          if (err) {
-            console.log('error', err.message);
-          } else {
-            console.log('INPUTED INTO DB SUCCESSFULLY LOLOL');
+        db.repo.find({owner: repo.owner.login}, function(err, doc) {
+          
+          if (err) {//this repo doesnt exists in our database
+
+            db.repo(formatted).save(function(err, doc) {
+              if (err) {
+                console.log('error', err.message);
+              } else {
+                console.log('INPUTED INTO DB SUCCESSFULLY LOLOL');
+              }
+            })
+            //add the repo to a list to be sent back to client
+            formattedRepos.push(formatted);
+          }
+          else {
+            console.log('Repo already exists in database');
           }
         })
+
+        
 
       });
       // console.log('', formattedRepos)
       //send back an array of repos
-
-
-
       res.send(JSON.stringify(formattedRepos));
 
     }
@@ -90,6 +101,11 @@ app.get('/repos', function (req, res) {
   console.log('get request received by server');
   // TODO
 });
+
+app.get('/', function(req, res) {
+  console.log('page load req sent to server');
+  res.end('okay');
+})
 
 app.options('/', function(req, res) {
   console.log('options request received by server');
