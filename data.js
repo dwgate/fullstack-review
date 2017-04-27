@@ -1,4 +1,4 @@
-[
+window.fakeRepos = [
   {
     "id": 18221276,
     "name": "git-consortium",
@@ -615,4 +615,4 @@
     "watchers": 0,
     "default_branch": "gh-pages"
   }
-]
+];

@@ -1,9 +1,12 @@
-let express = require('express');
-let db = require('../database/index.js');
-let bodyParser = require('body-parser');
-let request = require('request');
-let cors = require('cors');
-let app = express();
+const express = require('express');
+const db = require('../database/index.js');
+const bodyParser = require('body-parser');
+const request = require('request');
+const cors = require('cors');
+const app = express();
+const mongoose = require('mongoose');
+const fs = require('fs');
+const rp = require('request-promise')
 
 app.use(cors());
 
@@ -12,45 +15,55 @@ app.use(bodyParser.json());
 
 app.use(express.static(__dirname + '/../client/dist'));
 
+
+let formatRepo = function(repo) {
+  let formatted = {
+    owner: repo.owner.login,
+    name: repo.name,
+    description: repo.description,
+    link: repo.html_url,
+    size: repo.size
+  };
+  return formatted;
+};
+
 app.post('/repos/import', function (req, res) {
+  // e49dd7c7bd0dfc907b7c32eef1187b0b93aa7cf8
   let userName = req.body.user;
-  let userAgent = req.headers['user-agent'] + 'dwgate';
   console.log('processing request for user: ' , userName);
 
   let options = {
-    'url': 'https://api.github.com/users/' + userName + '/repos',
+    url: 'https://api.github.com/users/' + userName + '/repos',
     headers: {
       'user-agent':'dwgate' 
     }
   };
 
 
-// e49dd7c7bd0dfc907b7c32eef1187b0b93aa7cf8
+  rp(options)
+  .then( (repos) => {
+      //filter out the information we want -> or do this in the request
+      //if I can filter like that, I can maybe pass each item right into the db
+      let formattedRepos = [];
+      let response = JSON.parse(repos);
+      // console.log(response);
+      console.log('SUCCESS FROM GITHUB');
 
-let names = [];
-request(options, function(err, res) {
-  if (err) {
-    console.log('Error: ', err);
-  
-  } else {
-    console.log('Successful get from GitHub! \nstatus code: ', res.statusCode);
-    var returnRepo = JSON.parse(res.body);
-    returnRepo.forEach( (repo) => {
-      names.push([repo.name, repo.forks]);
-    });
-  }
+      response.forEach( (repo) => {
+        formattedRepos.push(formatRepo(repo));
+      });
+      // console.log('', formattedRepos)
+      //send back an array of repos
+      res.send(JSON.stringify(formattedRepos));
 
-  console.log('repo names: ', names);
+    }
+  )
+  .catch( (err) => {
+    console.log('ERROR ', err);
+  });
+
+
 });
-
-  res.end('cool');
-});
-
-
-
-
-
-
 
 
 
@@ -71,4 +84,5 @@ var port = 1128;
 app.listen(port, function() {
   console.log(`listening on port ${port}`);
 });
+
 

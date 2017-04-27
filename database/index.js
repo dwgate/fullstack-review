@@ -15,17 +15,14 @@ var userSchema = mongoose.Schema({
 
 
 
-var Repo = mongoose.model('Repo', repoSchema);
-var User = mongoose.model('User', userSchema);
-
-
 
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
-db.on('open', function() {
+db.once('open', function() {
   console.log('OPEN connection to database!');
 });
 
 
-module.exports.repo = Repo;
-module.exports.user = User;
+module.exports.repo = repoSchema;
+module.exports.user = userSchema;
+
