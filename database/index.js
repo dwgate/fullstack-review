@@ -1,9 +1,9 @@
-var mongoose = require('mongoose');
-var Schema = mongoose.Schema;
+const mongoose = require('mongoose');
 mongoose.connect('mongodb://localhost/fetcher');
+const Schema = mongoose.Schema;
 
 
-var repoSchema = new Schema({
+const repoSchema = new Schema({
   id: Number,
   owner: String,
   name: String,
@@ -12,19 +12,19 @@ var repoSchema = new Schema({
   size: Number
 });
 
-var userSchema = new Schema({
+const userSchema = new Schema({
   id: Number,
   name: String,
   user_id: Number
 });
 
-var repoModel = mongoose.model('repos', repoSchema);
-var userModel = mongoose.model('users', userSchema);
+const repoModel = mongoose.model('repos', repoSchema);
+const userModel = mongoose.model('users', userSchema);
 
 
 
 
-var db = mongoose.connection;
+const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', function() {
   console.log('OPEN connection to database!');
