@@ -3,9 +3,9 @@ import React from 'react';
 const RepoListEntry = ({repo}) => (
 
   <div>
-    <p>REPO OWNER: {repo.owner}</p>
-    REPO NAME: <a href={repo.link}>{repo.name}</a>
-    <p>REPO size: {repo.size}</p>
+    <p>Author: {repo.owner}</p>
+    Name: <a href={repo.link}>{repo.name}</a>
+    <p>Content size: {repo.size}</p>
   </div>
 
 )

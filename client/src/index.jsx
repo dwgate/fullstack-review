@@ -1,3 +1,4 @@
+// import './components/styles.css';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import $ from 'jquery';
@@ -12,7 +13,7 @@ class App extends React.Component {
     }
     //anytme i need to use a method with 'this', needs to bind in constructor
     this.search = this.search.bind(this);
-    this.filter = this.filterRepos.bind(this);
+    this.updateTopRepos = this.updateTopRepos.bind(this);
   }
 
   //this isn't working
@@ -79,7 +80,11 @@ class App extends React.Component {
   render () {
     return (<div>
       <h1>Github Fetcher</h1>
-      <RepoList repos={this.state.repos} />
+      <RepoList 
+        update={ this.updateTopRepos.bind(this) } 
+        repos={this.state.repos} 
+      />
+      
       <Search onSearch={ this.search.bind(this) } />
     </div>)
   }
